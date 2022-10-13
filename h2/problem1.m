@@ -1,16 +1,20 @@
-% https://blog.csdn.net/fjsd155/article/details/97892480
 
-str = "ababbccab";
-%str = "the dog in the fog"
-str = strrep(str,' ','#')
-A = [char(str)];
-n = length(str)
+str = "the dog in the fog";
+%str = "ababbccab";
+%str = "TCATC$";
 
-for i = 1:(n-1)
-    str = strcat(str(2:n), str(1))
-    A(i+1, :) = char(str)
+%BWT transform
+[y, L] = BWT(str);
+display(y)
+display(L)
+
+% construct B from (y,L)
+[n,row] = size(y);
+%last_row = y(1:n, i);
+for i = 1:n-1
+    newY = sortrows(y);
+    last_row = newY(1:n, i);
+    y(1:n, i+1) = last_row;
 end
 
-[B,index] = sortrows(A)
-y = B(:,9)
-L = index
+display(sortrows(y))

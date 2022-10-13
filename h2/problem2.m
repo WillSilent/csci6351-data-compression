@@ -3,42 +3,51 @@ k = 0:15;
 x = (k-8).^2 / 4;
 y = cos(k * (pi/16) + 1) + sin((2*k+1) * (pi/16));
 
-
-% fourier(x) %fourier未定义
-
 % fourier transformation
 Xfft = fft(x);
+display(Xfft')
 Yfft = fft(y);
+display(Yfft')
 
 % absolute value of X and Y
 Xabs= abs(Xfft);
+display(Xabs')
 Yabs= abs(Yfft);
+display(Yabs')
 
-% Xhat is a column derived from Xfft by replacing each of the 11 smallest-magnitude
+% XHat is a column derived from Xfft by replacing each of the 11 smallest-magnitude
 % elements of Xfft by 0, and leaving the other elements intact. YHat is defined similarly.
 [sortXfft, indexXfft] = sort(Xabs, 'ascend');
 indexXfft(1:11)
 %sortXfft(1:11)
+
 XHat = Xfft;
-
-XHat(indexXfft(1:11)) = 0
-
+XHat(indexXfft(1:11)) = 0;
+display(XHat')
 
 [sortYfft, indexYfft] = sort(Yabs, 'ascend');
 indexYfft(1:11)
 %sortYfft(1:11)
 YHat = Yfft;
-
-YHat(indexYfft(1:11)) = 0
+YHat(indexYfft(1:11)) = 0;
+display(YHat')
 
 % xHat is the inverse Fourier transform of XHat, yHat is similar
 xHat = ifft(XHat);
-yHat = ifft(YHat);
+display(xHat')
 
-table1 = [Xfft' Xabs' XHat']
-table2 = [Yfft' Yabs' YHat']
-table3 = [x' xHat']
-table4 = [y' yHat']
+yHat = ifft(YHat);
+display(yHat')
+
+
+table1 = [Xfft' Xabs' XHat'];
+display(table1)
+table2 = [Yfft' Yabs' YHat'];
+display(table2)
+table3 = [x' xHat'];
+display(table3)
+table4 = [y' yHat'];
+display(table4)
 
 % 2.b figure
 figure(1)
@@ -60,9 +69,9 @@ xlabel('k');
 hold off;
 
 % 2.c MSE
-xMSE = mean((xHat - x).^2)
-yMSE = mean((yHat - x).^2)
+xMSE2 = mean((xHat - x).^2);
+yMSE2 = mean((yHat - x).^2);
 
 % 2.d SNR
-xSNR = 20 * log10(x/(x-xHat))
-ySNR = 20 * log10(y/(y-yHat))
+xSNR2 = 20 * log10(abs(x)/abs(x-xHat));
+ySNR2 = 20 * log10(abs(y)/abs(y-yHat));
