@@ -18,6 +18,11 @@ function [y,L] = BWT(str)
     %display(index)
     %display(B(:, n))
     y = B(:,n);
-    L = index;
+
+    for i = 1:n
+        if index(i) == 1
+            L = i;
+        end
+    end
 end
 
