@@ -51,7 +51,7 @@ hold off;
 
 % 3.c MSE
 xMSE3 = mean((xHatDct - x).^2);
-yMSE3 = mean((yHatDct - x).^2);
+yMSE3 = mean((yHatDct - y).^2);
 
 % 3.d SNR
 

@@ -11,7 +11,7 @@ display(L)
 
 B = y
 tmp = sortrows(B)
-B(1:9, 3) = tmp(1:9, 2)
+B(1:9, 9) = tmp(1:9, 8)
 
 
 

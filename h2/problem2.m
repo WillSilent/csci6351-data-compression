@@ -70,7 +70,7 @@ hold off;
 
 % 2.c MSE
 xMSE2 = mean((xHat - x).^2);
-yMSE2 = mean((yHat - x).^2);
+yMSE2 = mean((yHat - y).^2);
 
 % 2.d SNR
 xSNR2 = 20 * log10(abs(x)/abs(x-xHat));

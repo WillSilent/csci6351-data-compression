@@ -44,7 +44,7 @@ display(table4)
 
 % 4.b
 xMSE4 = mean((smallx_Hadam_hat' - x).^2);
-yMSE4 = mean((smally_Hadam_hat' - x).^2);
+yMSE4 = mean((smally_Hadam_hat' - y).^2);
 
 %4.c
 figure(1)
