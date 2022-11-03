@@ -2,10 +2,6 @@
 G = ind2gray(I, map);
 
 dG = blockproc(G,[8 8],@(blkStruct) dct2(blkStruct.data));
-% Ghat= blockproc(dG,[8 8],@(blkStruct) idct2(blkStruct.data));
-% imagesc(Ghat);colormap(gray);
-
-% get all the dc term elements
 size(dG)
 
 m = 640 / 8;
@@ -20,14 +16,14 @@ for i = 1:n
     colDim(i) = 8;
 end
 
-
 % split the matrix into 8*8 block matrix 
 dG2 = mat2cell(dG, rowDim, colDim);
 
+%% get all the elements of term and counter-diagonals
 count = 1;
 dcTerm = zeros(m*n, 1);
 
-elementIn14 = zeros(m*n*14, 1);
+elementIn9 = zeros(m*n*9, 1);
 cn = 1;
 
 for i = 1:m
@@ -37,26 +33,13 @@ for i = 1:m
         %dc term
         dcTerm(count) = diag(B, 7);
 
-        for k = 2:1:5
+        for k = 2:1:4
             tmp = diag(B, 8-k);
             for z = 1: length(tmp)
-                elementIn14(cn) = tmp(z);
+                elementIn9(cn) = tmp(z);
                 cn = cn+1;
             end
         end
-            
-%         %2nd
-%         elementIn14(1:2) = diag(B, 6);
-% 
-%         %3rd
-%         elementIn14(3:5) = diag(B, 5);
-% 
-%         %4th
-%         elementIn14(6:9) = diag(B, 4);
-% 
-%         %5th
-%         elementIn14(10:14) = diag(B, 3);
-
         count = count + 1;
     end
 end
@@ -64,34 +47,25 @@ end
 %% do uniform 8-level quantizer of DC term
 [d, r] = uniform(dcTerm, 8);
 
+%% do e 4-level uniform quantizer of elementIn9
+[dOfEle9, rOfEle9] = uniform(elementIn9, 4);
 
-%% do e 4-level uniform quantizer of elementIn14
-[dOfEle14, rOfEle14] = uniform(elementIn14, 4);
 
-
+%% do quantize of data
 qG = zeros(640, 832);
-dGhat = zeros(640, 832);
-
-% do quantize of data
 for i = 1:m
     for j = 1:n
         B = flip(dG2{i,j}, 2);
         
         newMatrix = zeros(8, 8);
-        newdGMatrix = zeros(8, 8);
-
+        
         %dc term
         [qx] = quantize2D(diag(B, 7), d);
         newMatrix = newMatrix + diag(qx, 7);
-        
-        [dx] = dequantize2D(qx, r);
-        newdGMatrix = newdGMatrix + diag(qx, 7);
 
-        for k = 2:1:5
-            [qxOfEle14] = quantize2D(diag(B, 8-k), dOfEle14);
-            newMatrix = newMatrix + diag(qxOfEle14, 8-k);
-
-            [dxOfEle14] = quantize2D
+        for k = 2:1:4
+            [qxOfEle9] = quantize2D(diag(B, 8-k), dOfEle9);
+            newMatrix = newMatrix + diag(qxOfEle9, 8-k);
         end
         
         newBlock = flip(newMatrix,2);
@@ -100,25 +74,27 @@ for i = 1:m
 end
 
 %% do dequantize of qG
+dGhat = zeros(640, 832);
+qG2 = mat2cell(qG, rowDim, colDim);
 for i = 1:m
     for j = 1:n
-        B = flip(qG{i,j}, 2);
-        newMatrix = zeros(8, 8);
-        
+        B = flip(qG2{i,j}, 2);
+
+        newdGMatrix = zeros(8, 8);
+
         %term
         [dx] = dequantize2D(diag(B, 7), r);
-        newMatrix = newMatrix + diag(qx, 7);
+        newdGMatrix = newdGMatrix + diag(dx, 7);
 
         for k = 2:1:5
-            tmp = diag(B, 8-k);
-            [qxOfEle14] = quantize2D(tmp, dOfEle14);
-            tmp = qxOfEle14;
-            newMatrix = newMatrix + diag(qxOfEle14, 8-k);
+            [dxOfEle9] = dequantize2D(diag(B, 8-k), rOfEle9);
+            newdGMatrix = newdGMatrix + diag(dxOfEle9,  8-k);
         end
 
-
+        newDGHatBlock = flip(newdGMatrix, 2);
+        dGhat(((i-1)*8+1):(i*8),((j-1)*8+1):(j*8)) = newDGHatBlock;
     end
 end
 
-
-
+Ghat10= blockproc(dGhat,[8 8],@(blkStruct) idct2(blkStruct.data));
+imagesc(Ghat10);colormap(gray);

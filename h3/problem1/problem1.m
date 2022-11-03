@@ -20,6 +20,16 @@ mse5 = mean((dx_n5-X).^2);
 mse6 = mean((dx_n6-X).^2);
 mse8 = mean((dx_n8-X).^2);
 
+n = [5 6 8];
+MSEs = [mse5 mse6 mse8];
+
+figure(1);
+plot(n,MSEs);
+title('MSE’s of MLn');
+legend('MSE');
+xlabel('n');
+
+
 res1 = [X' qx_n5' dx_n5'];
 res2 = [X' qx_n6' dx_n6'];
 res3 = [X' qx_n8' dx_n8'];

@@ -1,7 +1,6 @@
 function [dx] = dequantize2D(qx, rs)
-    
+    dx = qx;
     sizeX = size(qx);
-    dx = zeros(sizeX);
     
     for i = 1:sizeX(1)
         for j = 1:sizeX(2)
