@@ -13,7 +13,7 @@ lv8 = 8;
 [uniqG, unids, unirs] = uniformQuantizer(G, lv8);
 
 %compute the entropy of 𝐺u'
-uniH = entropy(uniqG);
+uniH = computeEntropy(uniqG);
 
 % dequantize 𝐺u' into ^Gu
 [unidG] = uniformDequantizer(uniqG, unirs);
