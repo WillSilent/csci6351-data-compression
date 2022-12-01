@@ -1,7 +1,7 @@
-function [dGhat] = dequantize(block_size, qxOfDcTerm, rOfDcTerm, acTerms, rOfFirstACTerm, rOfNextACTerm)
-    m = 640 / block_size;
-    n = 832 / block_size;
-    dGhat = zeros(640, 832);
+function [dGhat] = dequantize(imageSizeX, block_size, qxOfDcTerm, rOfDcTerm, qxOfAcTerm, rOfFirstACTerm, rOfNextACTerm)
+    m = imageSizeX(1) / block_size;
+    n = imageSizeX(2) / block_size;
+    dGhat = zeros(imageSizeX(1), imageSizeX(2));
     
     dcCount = 1;
 
@@ -21,19 +21,19 @@ function [dGhat] = dequantize(block_size, qxOfDcTerm, rOfDcTerm, acTerms, rOfFir
 
             % first ac term
             stop = begin + term_size - 1;
-            [dxOfFirstAcTerm] = dequantize2D(acTerms(begin:stop), rOfFirstACTerm);
+            [dxOfFirstAcTerm] = dequantize2D(qxOfAcTerm(begin:stop), rOfFirstACTerm);
 
             % next ac term
             begin = stop + 1;
             stop = begin + term_size - 1;
-            [dxOfNextAcTerm] = dequantize2D(acTerms(begin:stop), rOfNextACTerm);
+            [dxOfNextAcTerm] = dequantize2D(qxOfAcTerm(begin:stop), rOfNextACTerm);
 
             % remian ac term
             stop = stop + (eachSize - 2*term_size);
             begin = stop + 1;
 
-            % eachSize 
-            allDxOfActerm = zeros(eachSize);
+            % reconstruct each blocks's ac term 
+            allDxOfActerm = zeros(eachSize,1);
             index = 1;
             stop = index + term_size - 1;
             allDxOfActerm(index : stop) = dxOfFirstAcTerm;
@@ -45,8 +45,14 @@ function [dGhat] = dequantize(block_size, qxOfDcTerm, rOfDcTerm, acTerms, rOfFir
             for diagIndex = block_size - 2: -1 : (-1*block_size + 1)
                 sizeX = size(diag(newdGMatrix, diagIndex));
                 stop = index + sizeX(1) - 1;
-                newdGMatrix = newdGMatrix + diag(allDxOfActerm(index:stop), diagIndex);
+                
+                ele = diag(allDxOfActerm(index:stop), diagIndex);
 
+                if mod(diagIndex, 2) ~=  0
+                    ele = diag(flip(allDxOfActerm(index:stop)), diagIndex);
+                end
+                
+                newdGMatrix = newdGMatrix + ele;
                 index = stop + 1;
             end
             
